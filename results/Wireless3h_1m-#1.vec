@@ -1,0 +1,102 @@
+version 2
+run Wireless3h_1m-1-20220205-13:27:38-31096
+attr configname Wireless3h_1m
+attr datetime 20220205-13:27:38
+attr experiment Wireless3h_1m
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsf ""
+attr measurement ""
+attr network Wireless3h_1m
+attr processid 31096
+attr repetition 1
+attr replication #1
+attr resultdir results
+attr runnumber 1
+attr seedset 1
+param *.host*.ipv4.arp.typename "\"GlobalArp\""
+param *.host1.numApps 1
+param *.host1.app[0].typename "\"RToFApp\""
+param *.host1.app[0].destAddresses "\"Broadcast\""
+param *.host1.app[0].localPort 6000
+param *.host1.app[0].destPort 5000
+param *.host1.app[0].packetName "\"Send msg\""
+param *.host1.app[0].isReceiver false
+param *.host1.app[0].arqName "\"Wireless3h_1m.csv\""
+param *.host1.mobility.typename "\"LinearMobility\""
+param *.host1.mobility.speed 5mps
+param *.host1.mobility.initialMovementHeading 270deg
+param *.host*.numApps 1
+param *.host*.app[0].typename "\"RToFApp\""
+param *.host*.app[0].localPort 5000
+param *.host*.app[0].destPort 6000
+param *.host*.app[0].isReceiver true
+param *.host*.wlan[0].typename "\"WirelessInterface\""
+param *.radioMedium.typename "\"ApskScalarRadioMedium\""
+param *.radioMedium.backgroundNoise.power -90dBm
+param *.radioMedium.mediumLimitCache.centerFrequency 2GHz
+param *.host*.wlan[0].radio.typename "\"ApskScalarRadio\""
+param *.host*.wlan[0].radio.centerFrequency 2GHz
+param *.host*.wlan[0].radio.bandwidth 2MHz
+param *.host*.wlan[0].radio.transmitter.power 1.4mW
+param *.host*.wlan[0].radio.transmitter.preambleDuration 10us
+param *.host*.wlan[0].radio.transmitter.headerLength 8B
+param *.host*.wlan[0].radio.receiver.sensitivity -85dBm
+param *.host*.wlan[0].radio.receiver.energyDetection -85dBm
+param *.host*.wlan[0].radio.receiver.snirThreshold 4dB
+param *.host*.wlan[0].mac.typename "\"CsmaCaMacRToF\""
+param *.host*.wlan[0].mac.ackTimeout 300us
+param *.host*.wlan[0].mac.useAck true
+param *.host*.wlan[0].mac.headerLength 23B
+param *.host*.**.bitrate 1Mbps
+param **.ip.limitedBroadcast true
+
+vector 0 Wireless3h_1m.host1.wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr source radioModeChanged
+attr title "Radio mode, vector"
+vector 1 Wireless3h_1m.host2.wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr source radioModeChanged
+attr title "Radio mode, vector"
+vector 2 Wireless3h_1m.host3.wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr source radioModeChanged
+attr title "Radio mode, vector"
+vector 3 Wireless3h_1m.host4.wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr source radioModeChanged
+attr title "Radio mode, vector"
+vector 4 Wireless3h_1m.host1.wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr source receptionStateChanged
+attr title "Radio reception state, vector"
+vector 5 Wireless3h_1m.host2.wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr source receptionStateChanged
+attr title "Radio reception state, vector"
+vector 6 Wireless3h_1m.host3.wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr source receptionStateChanged
+attr title "Radio reception state, vector"
+vector 7 Wireless3h_1m.host4.wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr source receptionStateChanged
+attr title "Radio reception state, vector"
+0	0	0	0
+0	0	0	0
+0	0	0	2
+1	0	0	0
+1	0	0	0
+1	0	0	2
+2	0	0	0
+2	0	0	0
+2	0	0	2
+3	0	0	0
+3	0	0	0
+3	0	0	2
+4	0	0	1
+5	0	0	1
+6	0	0	1
+7	0	0	1
+
