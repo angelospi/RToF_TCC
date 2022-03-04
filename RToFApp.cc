@@ -276,114 +276,10 @@ void RToFApp::processPacket(Packet *pk)
     // host->unsubscribe("transmissionStarted", listener);
 
     if(isReceiver){
-        //getting address
-        auto l3Addresses = pk->getTag<L3AddressInd>();
-        L3Address destAddr = l3Addresses->getSrcAddress();
-
-
-        auto signalTimeTag = pk->getTag<SignalTimeInd>();
-
-        std::ostringstream str;
-        str << packetName << "-" << numSent;
-
-        Packet *packet = new Packet(str.str().c_str());
-        const auto& payload = makeShared<ApplicationPacket>();
-        payload->setChunkLength(B(4));
-        payload->setSequenceNumber(numSent);
-
-        //getting the real position of nodes
-        cModule *host = getContainingNode(this);
-        IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
-        auto real_position = mobility->getCurrentPosition();
-
-        packet->setName(real_position.str().c_str());
-
-        packet->setTimestamp(signalTimeTag->getStartTime());
-
-        auto tags=payload->addTag<CreationTimeTag>();
-        tags->setCreationTime(signalTimeTag->getEndTime());
-
-        packet->insertAtBack(payload);
-
-        emit(packetSentSignal, packet);
-        socket.sendTo(packet, destAddr, destPort);
-
-        numSent++;
-
+        processPacketAnchors(pk);
     }else{
-        broadcastTime = IniTime;
-
-        saveXPoints(pk->getFullName());
-        saveYPoints(pk->getFullName());
-
-        auto backoffTime = pk->getTag<backoff>(); //getting backoffTime do CSMA
-
-
-        if(need_calibration == 1){
-            auto overhead = Calibration(broadcastTime, pk->getArrivalTime(), backoffTime->getBackoffTime() );//overhead from environment with two hosts is 0.001182000001
-            std::cout << "overhead: " << overhead << endl;
-        }
-
-
-        // backoffTest += backoffTime->getBackoffTime();
-
-        //std::cout << "TESTE do CSMA: " << backoffTime->getBackoffTime() << " TESTE do cancel Time: " << backoffTime->getInitialBackoffTime() << endl;
-
-        //auto measuredWithNoise = pk->getArrivalTime() + host->intuniform(-2,2)*0.0000000125;
-        auto measuredWithNoise = pk->getArrivalTime();
-
-        // std::cout << " measuredWithNoise"<<measuredWithNoise << endl;
-
-        //0.001142000001 sem 0.00019
-        //0.001332000001
-        auto dist = distanceCalc(measuredWithNoise, broadcastTime, overhead,  backoffTime->getBackoffTime());
-        std::cout << "Distance between hosts getting auto backoff = " << dist << endl;
-
-        std::cout << " " << endl;
-        std::cout << " " << endl;
-
-        di.push_back(dist);
-
-        for (unsigned int i = 0; i < yVector.size(); i++)
-        {
-            std::cout << "di: " << di[i] <<",   Time Flight: " << timeFlight[i] << endl;
-        }
-
-        //minMax();
-        mL();
-
-
-        cModule *host = getContainingNode(this);
-        IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
-        auto real_position = mobility->getCurrentPosition();
-
-        std::cout << "-------------" << endl;
-        std::cout << "Real position:" << real_position << endl;
-
-
-        if(numReceived==2){
-            yVector.clear();
-            xVector.clear();
-            di.clear();
-            numReceived=-1;
-            sendPacket();
-            //auto initTime=simTime()+0.000088+0.00036;//+0.00019;
-            overhead=0.001332000001+0.000088+0.00036;
-            //setIniTime(initTime);
-            setIniTime(simTime());
-            //Quando entra aqui existe um backoff time para reenvio da msg e mais um tempo adicional
-            //Dessa forma tem q somar o 0.000088 + backoff, se o valor 0.00019 ja estiver dentro do overhead,
-            //se não estiver tem q somar ele tambem isso
-            //Entao o init time=simTime()+0.00019+0.000088(Talvez possa ser o tempo da msg CSMA quando encerra o primeiro ciclo)
-            //+0.00036(Tempo do backoff para envio da msg novamente)
-
-            EV<< "SEND PACKET: "<< simTime();
-            //EV<< "back off: "<<backoffTime->getBackoffTime();
-            //EV<< "init time: "<< initTime;
-            // EV<< "Num received:"<<numReceived;
-        }
+        processPacketIssuer(pk);
     }
-
     numReceived++;
     delete pk;
 
@@ -543,6 +439,111 @@ void RToFApp::setIniTime(simtime_t time)
     IniTime = time;
 }
 
+void RToFApp::processPacketAnchors(Packet *pk){
+    //getting address
+    auto l3Addresses = pk->getTag<L3AddressInd>();
+    L3Address destAddr = l3Addresses->getSrcAddress();
 
 
+    auto signalTimeTag = pk->getTag<SignalTimeInd>();
+
+    std::ostringstream str;
+    str << packetName << "-" << numSent;
+
+    Packet *packet = new Packet(str.str().c_str());
+    const auto& payload = makeShared<ApplicationPacket>();
+    payload->setChunkLength(B(4));
+    payload->setSequenceNumber(numSent);
+
+    //getting the real position of nodes
+    cModule *host = getContainingNode(this);
+    IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
+    auto real_position = mobility->getCurrentPosition();
+
+    packet->setName(real_position.str().c_str());
+
+    packet->setTimestamp(signalTimeTag->getStartTime());
+
+    auto tags=payload->addTag<CreationTimeTag>();
+    tags->setCreationTime(signalTimeTag->getEndTime());
+
+    packet->insertAtBack(payload);
+
+    emit(packetSentSignal, packet);
+    socket.sendTo(packet, destAddr, destPort);
+
+    numSent++;
+}
+
+void RToFApp::processPacketIssuer(Packet *pk){
+    broadcastTime = IniTime;
+
+    saveXPoints(pk->getFullName());
+    saveYPoints(pk->getFullName());
+
+    auto backoffTime = pk->getTag<backoff>(); //getting backoffTime do CSMA
+
+
+    if(need_calibration == 1){
+        auto overhead = Calibration(broadcastTime, pk->getArrivalTime(), backoffTime->getBackoffTime() );//overhead from environment with two hosts is 0.001182000001
+        std::cout << "overhead: " << overhead << endl;
+    }
+
+
+    // backoffTest += backoffTime->getBackoffTime();
+
+    //std::cout << "TESTE do CSMA: " << backoffTime->getBackoffTime() << " TESTE do cancel Time: " << backoffTime->getInitialBackoffTime() << endl;
+
+    //auto measuredWithNoise = pk->getArrivalTime() + host->intuniform(-2,2)*0.0000000125;
+    auto measuredWithNoise = pk->getArrivalTime();
+
+    // std::cout << " measuredWithNoise"<<measuredWithNoise << endl;
+
+    //0.001142000001 sem 0.00019
+    //0.001332000001
+    auto dist = distanceCalc(measuredWithNoise, broadcastTime, overhead,  backoffTime->getBackoffTime());
+    std::cout << "Distance between hosts getting auto backoff = " << dist << endl;
+
+    std::cout << " " << endl;
+    std::cout << " " << endl;
+
+    di.push_back(dist);
+
+    for (unsigned int i = 0; i < yVector.size(); i++)
+    {
+        std::cout << "di: " << di[i] <<",   Time Flight: " << timeFlight[i] << endl;
+    }
+
+    mL();
+
+    cModule *host = getContainingNode(this);
+    IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
+    auto real_position = mobility->getCurrentPosition();
+
+    std::cout << "-------------" << endl;
+    std::cout << "Real position:" << real_position << endl;
+
+
+    if(numReceived==2){
+        yVector.clear();
+        xVector.clear();
+        di.clear();
+        numReceived=-1;
+        sendPacket();
+        //auto initTime=simTime()+0.000088+0.00036;//+0.00019;
+        overhead=0.001332000001+0.000088+0.00036;
+        //setIniTime(initTime);
+        setIniTime(simTime());
+        //Quando entra aqui existe um backoff time para reenvio da msg e mais um tempo adicional
+        //Dessa forma tem q somar o 0.000088 + backoff, se o valor 0.00019 ja estiver dentro do overhead,
+        //se não estiver tem q somar ele tambem isso
+        //Entao o init time=simTime()+0.00019+0.000088(Talvez possa ser o tempo da msg CSMA quando encerra o primeiro ciclo)
+        //+0.00036(Tempo do backoff para envio da msg novamente)
+
+        EV<< "SEND PACKET: "<< simTime();
+        //EV<< "back off: "<<backoffTime->getBackoffTime();
+        //EV<< "init time: "<< initTime;
+        // EV<< "Num received:"<<numReceived;
+    }
+}
 

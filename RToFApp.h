@@ -102,6 +102,8 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     virtual omnetpp::simtime_t Calibration(simtime_t StartT, simtime_t EndT, simtime_t backoffTime);
     virtual void minMax();
     virtual void mL();
+    virtual void processPacketAnchors(Packet *pk);
+    virtual void processPacketIssuer(Packet *pk);
 
 
     virtual void socketDataArrived(UdpSocket *socket, Packet *packet) override;

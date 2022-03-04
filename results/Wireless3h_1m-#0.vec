@@ -1,14 +1,14 @@
 version 2
-run Wireless3h_1m-0-20220303-22:12:10-28844
+run Wireless3h_1m-0-20220303-23:02:20-31554
 attr configname Wireless3h_1m
-attr datetime 20220303-22:12:10
+attr datetime 20220303-23:02:20
 attr experiment Wireless3h_1m
 attr inifile omnetpp.ini
 attr iterationvars ""
 attr iterationvarsf ""
 attr measurement ""
 attr network Wireless3h_1m
-attr processid 28844
+attr processid 31554
 attr repetition 0
 attr replication #0
 attr resultdir results
@@ -260,7 +260,6 @@ attr title "Radio transmission state, vector"
 2	0	0	2
 2	106	0.002994016698	3
 2	111	0.003540016698	2
-2	230	0.007022036867	3
 3	0	0	0
 3	0	0	0
 3	0	0	2
@@ -317,7 +316,6 @@ attr title "Radio transmission state, vector"
 5	202	0.005998030193	0
 5	207	0.006544030193	1
 5	219	0.006554036867	3
-5	223	0.006772036867	1
 6	0	0	1
 6	19	0.000190003336	3
 6	23	0.000736003336	1
@@ -342,8 +340,6 @@ attr title "Radio transmission state, vector"
 6	206	0.005998036864	3
 6	215	0.006544036864	1
 6	220	0.006554036867	3
-6	224	0.006772036867	1
-6	230	0.007022036867	0
 7	0	0	1
 7	20	0.000190003339	3
 7	38	0.000736003339	1
@@ -368,7 +364,6 @@ attr title "Radio transmission state, vector"
 7	205	0.00599803491	3
 7	213	0.00654403491	1
 7	221	0.006554036975	3
-7	227	0.006772036975	1
 8	3	0	12
 8	117	0.003540020034	12
 9	11	0	32
@@ -505,6 +500,4 @@ attr title "Radio transmission state, vector"
 45	107	0.002994016698	2
 45	111	0.003540016698	1
 45	111	0.003540016698	0
-45	230	0.007022036867	1
-45	231	0.007022036867	2
 
