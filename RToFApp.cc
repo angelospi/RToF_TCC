@@ -336,7 +336,7 @@ void RToFApp::processPacket(Packet *pk)
 
         //0.001142000001 sem 0.00019
         //0.001332000001
-        auto dist = distanceCalc(measuredWithNoise, broadcastTime, 0.001142000001,  backoffTime->getBackoffTime());
+        auto dist = distanceCalc(measuredWithNoise, broadcastTime, overhead,  backoffTime->getBackoffTime());
         std::cout << "Distance between hosts getting auto backoff = " << dist << endl;
 
         std::cout << " " << endl;
@@ -366,17 +366,20 @@ void RToFApp::processPacket(Packet *pk)
             xVector.clear();
             di.clear();
             numReceived=-1;
-            // overhead=0.00019+0.000088+0.00036;
             sendPacket();
-            auto initTime=simTime()+0.00019+0.000088+0.00036;
-            setIniTime(initTime);
+            //auto initTime=simTime()+0.000088+0.00036;//+0.00019;
+            overhead=0.001332000001+0.000088+0.00036;
+            //setIniTime(initTime);
+            setIniTime(simTime());
             //Quando entra aqui existe um backoff time para reenvio da msg e mais um tempo adicional
-            //Dessa forma tem q somar o 0.00019 + 0.000088 + backoff
-            //Ai setar o valor inicial com simTime()
+            //Dessa forma tem q somar o 0.000088 + backoff, se o valor 0.00019 ja estiver dentro do overhead,
+            //se não estiver tem q somar ele tambem isso
+            //Entao o init time=simTime()+0.00019+0.000088(Talvez possa ser o tempo da msg CSMA quando encerra o primeiro ciclo)
+            //+0.00036(Tempo do backoff para envio da msg novamente)
 
             EV<< "SEND PACKET: "<< simTime();
             //EV<< "back off: "<<backoffTime->getBackoffTime();
-            EV<< "init time: "<< initTime;
+            //EV<< "init time: "<< initTime;
             // EV<< "Num received:"<<numReceived;
         }
     }
