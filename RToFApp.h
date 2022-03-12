@@ -97,6 +97,7 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     virtual const char* ConvertDoubleToString(double value1, double value2);
     virtual omnetpp::simtime_t Calibration(simtime_t StartT, simtime_t EndT, simtime_t backoffTime);
     virtual void mL();
+    virtual void insertToCsv();
     virtual void processPacketAnchors(Packet *pk);
     virtual void processPacketIssuer(Packet *pk);
 

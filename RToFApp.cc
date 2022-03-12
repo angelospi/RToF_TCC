@@ -174,62 +174,6 @@ void RToFApp::handleMessageWhenUp(cMessage *msg)
 
 void RToFApp::finish()
 {
-    if (!isReceiver){
-        std::ifstream arq;
-        std::ofstream myfile;
-
-        arq.open("planilha_dados/"+std::string(arqName));
-
-        if(arq.is_open()){
-            myfile.open ("planilha_dados/"+std::string(arqName),std::ios::app);
-
-            for(int i = 0; i < xVector.size(); i++){
-                myfile.precision(10);
-                myfile<<std::fixed;
-                myfile<<timeFlight[i]<<",";
-            }
-            for(int i = 0; i < xVector.size(); i++){
-                myfile<<di[i]<<",";
-            }
-
-            myfile<<mL_x<<","<<mL_y<<",";
-            myfile<<realPosition.x<<","<<realPosition.y<<",";
-
-            myfile<<"\n";
-        }else{
-            myfile.open("planilha_dados/"+std::string(arqName));
-
-            for(int i = 0; i < xVector.size(); i++){
-                myfile << "Overhead + backofftime " << i << "(s),";
-            }
-
-            for(int i = 0; i < xVector.size(); i++){
-                myfile << "Distance host " << i << "(m),";
-            }
-            myfile << "Likelihood position X (m),";
-            myfile << "Likelihood position Y (m),";
-            myfile << "Real position X (m),";
-            myfile << "Real position Y (m)";
-
-            myfile<<"\n";
-
-            for(int i = 0; i < xVector.size(); i++){
-                myfile.precision(10);
-                myfile<<std::fixed;
-                myfile<<timeFlight[i]<<",";
-            }
-            for(int i = 0; i < xVector.size(); i++){
-                myfile<<di[i]<<",";
-            }
-            myfile<<mL_x<<","<<mL_y<<",";
-            myfile<<realPosition.x<<","<<realPosition.y<<",";
-
-            myfile<<"\n";
-        }
-        myfile.close();
-        arq.close();
-    }
-
     ApplicationBase::finish();
 }
 
@@ -323,8 +267,8 @@ void RToFApp::mL(){
 //    std::cout << "Resultado A_t: " << endl << A_t <<endl;
     A_i = (A_t * A).inverse();
     A = A_i * A_t * b;
-    double mL_x = A(0,0);
-    double mL_y = A(1,0);
+    mL_x = A(0,0);
+    mL_y = A(1,0);
     std::cout << "Resultado ML x,y: " << endl << mL_x << ", " << mL_y <<endl;
 }
 
@@ -460,17 +404,17 @@ void RToFApp::processPacketIssuer(Packet *pk){
         std::cout << "di: " << di[i] <<",   Time Flight: " << timeFlight[i] << endl;
     }
 
-    mL();
-
     cModule *host = getContainingNode(this);
     IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
     auto real_position = mobility->getCurrentPosition();
-
-    std::cout << "-------------" << endl;
-    std::cout << "Real position:" << real_position << endl;
+    realPosition.x=real_position.x;
+    realPosition.y=real_position.y;
 
     //Verifica se recebeu as mensagens de todos os nós que deveria
     if(numReceived==(num_receptores-1)){
+        mL();
+        insertToCsv();
+
         yVector.clear();
         xVector.clear();
         di.clear();
@@ -484,3 +428,49 @@ void RToFApp::processPacketIssuer(Packet *pk){
     }
 }
 
+
+void RToFApp::insertToCsv(){
+    if (!isReceiver){
+        std::ifstream arq;
+        std::ofstream myfile;
+
+        arq.open("planilha_dados/"+std::string(arqName));
+
+        if(arq.is_open()){
+            myfile.open ("planilha_dados/"+std::string(arqName),std::ios::app);
+
+            // for(int i = 0; i < xVector.size(); i++){
+            //     myfile.precision(10);
+            //     myfile<<std::fixed;
+            //     myfile<<timeFlight[i]<<",";
+            //}
+            // for(int i = 0; i < xVector.size(); i++){
+            //    myfile<<di[i]<<",";
+            //}
+
+            myfile<<mL_x<<","<<mL_y<<",";
+            myfile<<realPosition.x<<","<<realPosition.y<<",";
+
+            myfile<<"\n";
+        }else{
+            myfile.open("planilha_dados/"+std::string(arqName));
+
+            // for(int i = 0; i < xVector.size(); i++){
+            //    myfile << "Distance host " << i << "(m),";
+            //}
+            myfile << "Likelihood position X (m),";
+            myfile << "Likelihood position Y (m),";
+            myfile << "Real position X (m),";
+            myfile << "Real position Y (m)";
+
+            myfile<<"\n";
+
+            myfile<<mL_x<<","<<mL_y<<",";
+            myfile<<realPosition.x<<","<<realPosition.y<<",";
+
+            myfile<<"\n";
+        }
+        myfile.close();
+        arq.close();
+    }
+}
