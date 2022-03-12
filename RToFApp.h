@@ -40,7 +40,7 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     int need_calibration = 0;
     const char* arqName = nullptr;
     Coord realPosition;
-    double minMax_x, minMax_y, mL_x, mL_y;
+    double mL_x, mL_y;
 
     // parameters
     std::vector<L3Address> destAddresses;
@@ -54,7 +54,6 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     UdpSocket socket;
     cMessage *selfMsg = nullptr;
 
-
     // statistics
     int numSent = 0;
     int numReceived = 0;
@@ -64,11 +63,7 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     std::vector<double> di;
     std::vector<double> timeFlight;
     simtime_t overhead;
-
-    //Listener
     simtime_t IniTime;
-    simsignal_t transmissionStarted;
-    Listener *listener;
 
   protected:
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -100,7 +95,6 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     virtual void saveYPoints(const char *local);
     virtual const char* ConvertDoubleToString(double value1, double value2);
     virtual omnetpp::simtime_t Calibration(simtime_t StartT, simtime_t EndT, simtime_t backoffTime);
-    virtual void minMax();
     virtual void mL();
     virtual void processPacketAnchors(Packet *pk);
     virtual void processPacketIssuer(Packet *pk);

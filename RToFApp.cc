@@ -65,12 +65,10 @@ void RToFApp::initialize(int stage)
         numReceived = 0;
         WATCH(numSent);
         WATCH(numReceived);
-        minMax_x  = 0;
-        minMax_y  = 0;
         mL_x = 0;
         mL_y = 0;
 
-        overhead=0.001332000001;
+        overhead=0.001192000001;
         need_calibration = par("need_calibration");
 
         arqName = par("arqName");
@@ -154,12 +152,6 @@ void RToFApp::sendPacket()
     cModule *host = getContainingNode(this);
     std::cout << "host: " << host << endl;
 
-    //auto backoffTime = packet->getTag<backoff>();
-    //EV<<"Backoff: "<< packet->getBackoffTime();
-    // setIniTime(simTime());
-    // listener = new Listener();
-    // host->subscribe("transmissionStarted", listener);
-
     emit(packetSentSignal, packet);
     socket.sendTo(packet, destAddr, destPort);
 
@@ -197,7 +189,6 @@ void RToFApp::finish()
                 myfile<<di[i]<<",";
             }
 
-            myfile<<minMax_x<<","<<minMax_y<<",";
             myfile<<mL_x<<","<<mL_y<<",";
             myfile<<realPosition.x<<","<<realPosition.y<<",";
 
@@ -212,8 +203,6 @@ void RToFApp::finish()
             for(int i = 0; i < xVector.size(); i++){
                 myfile << "Distance host " << i << "(m),";
             }
-            myfile << "Min max position X (m),";
-            myfile << "Min max position Y (m),";
             myfile << "Likelihood position X (m),";
             myfile << "Likelihood position Y (m),";
             myfile << "Real position X (m),";
@@ -229,7 +218,6 @@ void RToFApp::finish()
             for(int i = 0; i < xVector.size(); i++){
                 myfile<<di[i]<<",";
             }
-            myfile<<minMax_x<<","<<minMax_y<<",";
             myfile<<mL_x<<","<<mL_y<<",";
             myfile<<realPosition.x<<","<<realPosition.y<<",";
 
@@ -272,9 +260,6 @@ void RToFApp::processPacket(Packet *pk)
     emit(packetReceivedSignal, pk);
     EV_INFO << "Received packet: " << UdpSocket::getReceivedPacketInfo(pk) << endl;
 
-    cModule *host = getSystemModule()->getSubmodule("host1");
-    // host->unsubscribe("transmissionStarted", listener);
-
     if(isReceiver){
         processPacketAnchors(pk);
     }else{
@@ -306,51 +291,10 @@ void RToFApp::handleCrashOperation(LifecycleOperation *operation)
 
 double RToFApp::distanceCalc(simtime_t finalT, simtime_t iniT, simtime_t overhead, simtime_t backoff)
 {
-    std::cout<<"iniT:"<<iniT<<endl;
-    std::cout<<"Overhead+backoff:"<<(overhead + backoff ).dbl()<<endl;
-    std::cout<<"backoff:"<< backoff<<endl;
-    std::cout<<"Overhead:"<< overhead<<endl;
-    std::cout<<"Final T:"<<finalT<<endl;
     double distance = (((299792458 * (finalT - iniT - overhead - backoff ).dbl())/2.0)); // overhead, this was found through an environment with two hosts at a distance of 1m, thus calculating the distance, the result with overhead was subtracted of the real distance
 
     timeFlight.push_back((overhead + backoff ).dbl());
     return distance;
-}
-
-void RToFApp::minMax()
-{
-    // double xv[4], yv[4];
-    // std::cout << "testing min max X0: "<< xv[0] << endl;
-    double max_x, min_x, max_y, min_y;
-    double x1, x2, y1, y2;
-
-    for(int i = 0; i < xVector.size(); i++){
-        if(i==0)
-        {
-            max_x = xVector[i] - di[i];
-            min_x = xVector[i] + di[i];
-
-            max_y = yVector[i] - di[i];
-            min_y = yVector[i] + di[i];
-        }
-        else
-        {
-            if (max_x < xVector[i] - di[i])
-              max_x = xVector[i] - di[i];
-
-            if (min_x > xVector[i] + di[i])
-              min_x = xVector[i] + di[i];
-
-            if (max_y < yVector[i] - di[i])
-              max_y = yVector[i] - di[i];
-
-            if (min_y > yVector[i] + di[i])
-              min_y = yVector[i] + di[i];
-        }
-    }
-    minMax_x = (max_x + min_x)/2;
-    minMax_y = (max_y + min_y)/2;
-    std::cout << "testing min max X0: "<< minMax_x <<" Y0: " << minMax_y << endl;
 }
 
 void RToFApp::mL(){
@@ -499,9 +443,8 @@ void RToFApp::processPacketIssuer(Packet *pk){
 
     // std::cout << " measuredWithNoise"<<measuredWithNoise << endl;
 
-    //0.001142000001 sem 0.00019
-    //0.001332000001
-    auto dist = distanceCalc(measuredWithNoise, broadcastTime, overhead,  backoffTime->getBackoffTime());
+    //0.001192000001
+    auto dist = distanceCalc(measuredWithNoise, broadcastTime, overhead, backoffTime->getBackoffTime());
     std::cout << "Distance between hosts getting auto backoff = " << dist << endl;
 
     std::cout << " " << endl;
@@ -523,27 +466,19 @@ void RToFApp::processPacketIssuer(Packet *pk){
     std::cout << "-------------" << endl;
     std::cout << "Real position:" << real_position << endl;
 
-
+    //Verifica se recebeu as mensagens de todos os nós que deveria
     if(numReceived==2){
         yVector.clear();
         xVector.clear();
         di.clear();
         numReceived=-1;
         sendPacket();
-        //auto initTime=simTime()+0.000088+0.00036;//+0.00019;
-        overhead=0.001332000001+0.000088+0.00036;
-        //setIniTime(initTime);
+
+        overhead=0.001192000001+0.000228;
+
         setIniTime(simTime());
-        //Quando entra aqui existe um backoff time para reenvio da msg e mais um tempo adicional
-        //Dessa forma tem q somar o 0.000088 + backoff, se o valor 0.00019 ja estiver dentro do overhead,
-        //se não estiver tem q somar ele tambem isso
-        //Entao o init time=simTime()+0.00019+0.000088(Talvez possa ser o tempo da msg CSMA quando encerra o primeiro ciclo)
-        //+0.00036(Tempo do backoff para envio da msg novamente)
 
         EV<< "SEND PACKET: "<< simTime();
-        //EV<< "back off: "<<backoffTime->getBackoffTime();
-        //EV<< "init time: "<< initTime;
-        // EV<< "Num received:"<<numReceived;
     }
 }
 

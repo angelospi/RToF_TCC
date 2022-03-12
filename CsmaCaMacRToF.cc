@@ -29,7 +29,6 @@
 #include "CsmaCaMacRToF.h"
 #include "Backoff_m.h"
 
-
 using namespace inet;
 
 using namespace inet::physicallayer;
@@ -297,6 +296,8 @@ void CsmaCaMacRToF::handleWithFsm(cMessage *msg)
                                   IDLE,
                 if (retryCounter == 0) numSentWithoutRetry++;
                 numSent++;
+                invalidateBackoffPeriod();
+                cancelledPeriod=0;
                 cancelAckTimer();
                 finishCurrentTransmission();
             );
@@ -405,6 +406,7 @@ void CsmaCaMacRToF::encapsulate(Packet *frame)
     int userPriority = userPriorityReq == nullptr ? UP_BE : userPriorityReq->getUserPriority();
     macHeader->setPriority(userPriority == -1 ? UP_BE : userPriority);
     frame->insertAtFront(macHeader);
+
     auto macTrailer = makeShared<CsmaCaMacRToFTrailer>();
     macTrailer->setFcsMode(fcsMode);
 
@@ -431,8 +433,11 @@ void CsmaCaMacRToF::decapsulate(Packet *frame)
     auto transportProtocol = ProtocolGroup::ethertype.getProtocol(networkProtocol);
     frame->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(transportProtocol);
     frame->addTagIfAbsent<PacketProtocolTag>()->setProtocol(transportProtocol);
-    auto backoffTime = backOffHeader->getBackoffTime();
-    frame->addTagIfAbsent<backoff>()->setBackoffTime(backoffTime); //add the backoffTime in tag Backoff
+
+    //Soma também o backoff do tempo da mensagem enviada pelo nó emissor
+    auto backoffTime_inside_msg = backOffHeader->getBackoffTime();
+    auto backoff_issue_anchor=backoffPeriodTransmitted+backoffTime_inside_msg;
+    frame->addTagIfAbsent<backoff>()->setBackoffTime(backoff_issue_anchor); //add the backoffTime in tag Backoff
 }
 
 /****************************************************************
@@ -507,8 +512,10 @@ void CsmaCaMacRToF::decreaseBackoffPeriod()
 
 void CsmaCaMacRToF::scheduleBackoffTimer()
 {
+
     if (backoffPeriod >= 0) {
         simtime_t elapsedBackoffTime = simTime() - endBackoff->getSendingTime();
+
         cancelledPeriod += elapsedBackoffTime;
         std::cout << "cancelledPeriod = " << cancelledPeriod << endl;
         EV << "cancelledPeriod = " << cancelledPeriod << endl;
