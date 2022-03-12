@@ -39,6 +39,7 @@
 #include "inet/common/scheduler/RealTimeScheduler.h"
 #include "Backoff_m.h"
 #include <fstream>
+#include <string>
 
 
 using namespace inet;
@@ -175,10 +176,10 @@ void RToFApp::finish()
         std::ifstream arq;
         std::ofstream myfile;
 
-        arq.open(arqName);
+        arq.open("planilha_dados/"+std::string(arqName));
 
         if(arq.is_open()){
-            myfile.open (arqName,std::ios::app);
+            myfile.open ("planilha_dados/"+std::string(arqName),std::ios::app);
 
             for(int i = 0; i < xVector.size(); i++){
                 myfile.precision(10);
@@ -194,7 +195,7 @@ void RToFApp::finish()
 
             myfile<<"\n";
         }else{
-            myfile.open(arqName);
+            myfile.open("planilha_dados/"+std::string(arqName));
 
             for(int i = 0; i < xVector.size(); i++){
                 myfile << "Overhead + backofftime " << i << "(s),";

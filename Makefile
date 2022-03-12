@@ -36,7 +36,6 @@ OBJS = \
     $O/CsmaCaMacRToFProtocolDissector.o \
     $O/CsmaCaMacRToFProtocolPrinter.o \
     $O/EthernetCRCRToF.o \
-    $O/Listener.o \
     $O/RToFApp.o \
     $O/Backoff_m.o \
     $O/CsmaCaMacRToFHeader_m.o

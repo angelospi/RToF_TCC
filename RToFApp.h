@@ -17,7 +17,6 @@
 #include <Eigen/Dense>
 
 #include "inet/common/INETDefs.h"
-#include "Listener.h"
 
 #include "inet/applications/base/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
@@ -103,8 +102,6 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     virtual void socketDataArrived(UdpSocket *socket, Packet *packet) override;
     virtual void socketErrorArrived(UdpSocket *socket, Indication *indication) override;
     virtual void socketClosed(UdpSocket *socket) override;
-
-    //virtual omnetpp::cIListener ListenerTeste(cComponent* source, simsignal_t signalID, cObject* obj, cObject* details);
 
   public:
     RToFApp() {}
