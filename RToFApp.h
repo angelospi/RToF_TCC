@@ -40,6 +40,7 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     const char* arqName = nullptr;
     Coord realPosition;
     double mL_x, mL_y;
+    int num_receptores;
 
     // parameters
     std::vector<L3Address> destAddresses;
@@ -62,6 +63,7 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     std::vector<double> di;
     std::vector<double> timeFlight;
     simtime_t overhead;
+    simtime_t overhead_segundo_envio;
     simtime_t IniTime;
 
   protected:

@@ -29,6 +29,7 @@ simple RToFApp like IApp
         string destAddresses = default(""); // list of IP addresses, separated by spaces ("": don't send)
         string localAddress = default("");
         string packetName = default("UdpBasicAppData");
+        int num_receptores= default(0);
         int destPort;
         @display("i=block/app");
         @lifecycleSupport;

@@ -70,6 +70,7 @@ void RToFApp::initialize(int stage)
         mL_y = 0;
 
         overhead=0.001192000001;
+        overhead_segundo_envio=0.001192000001+0.000228;
         need_calibration = par("need_calibration");
 
         arqName = par("arqName");
@@ -78,6 +79,7 @@ void RToFApp::initialize(int stage)
         isReceiver = par("isReceiver");
         packetName = par("packetName");
         selfMsg = new cMessage("sendTimer");
+        num_receptores=par("num_receptores");
     }
 }
 
@@ -468,18 +470,17 @@ void RToFApp::processPacketIssuer(Packet *pk){
     std::cout << "Real position:" << real_position << endl;
 
     //Verifica se recebeu as mensagens de todos os nós que deveria
-    if(numReceived==2){
+    if(numReceived==(num_receptores-1)){
         yVector.clear();
         xVector.clear();
         di.clear();
+
         numReceived=-1;
         sendPacket();
 
-        overhead=0.001192000001+0.000228;
+        overhead=overhead_segundo_envio;
 
         setIniTime(simTime());
-
-        EV<< "SEND PACKET: "<< simTime();
     }
 }
 
