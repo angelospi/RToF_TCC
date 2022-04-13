@@ -444,9 +444,9 @@ void RToFApp::insertToCsv(){
             //     myfile<<std::fixed;
             //     myfile<<timeFlight[i]<<",";
             //}
-            // for(int i = 0; i < xVector.size(); i++){
-            //    myfile<<di[i]<<",";
-            //}
+            for(int i = 0; i < xVector.size(); i++){
+               myfile<<di[i]<<",";
+            }
 
             myfile<<mL_x<<","<<mL_y<<",";
             myfile<<realPosition.x<<","<<realPosition.y<<",";
@@ -455,9 +455,9 @@ void RToFApp::insertToCsv(){
         }else{
             myfile.open("planilha_dados/"+std::string(arqName));
 
-            // for(int i = 0; i < xVector.size(); i++){
-            //    myfile << "Distance host " << i << "(m),";
-            //}
+            for(int i = 0; i < xVector.size(); i++){
+               myfile << "Distance host " << i << "(m),";
+            }
             myfile << "Likelihood position X (m),";
             myfile << "Likelihood position Y (m),";
             myfile << "Real position X (m),";
@@ -465,6 +465,9 @@ void RToFApp::insertToCsv(){
 
             myfile<<"\n";
 
+            for(int i = 0; i < xVector.size(); i++){
+               myfile<<di[i]<<",";
+            }
             myfile<<mL_x<<","<<mL_y<<",";
             myfile<<realPosition.x<<","<<realPosition.y<<",";
 
