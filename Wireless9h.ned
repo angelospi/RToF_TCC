@@ -39,30 +39,30 @@ network Wireless9h
             @display("p=100,100");
         }
         host2: <default("WirelessHost")> like INetworkNode {
-            @display("p=105,100");
+            @display("p=110,100");
         }
         host3: <default("WirelessHost")> like INetworkNode {
-            @display("p=95,100");
+            @display("p=90,100");
         }
         host4: <default("WirelessHost")> like INetworkNode {
-            @display("p=100,105");
+            @display("p=100,110");
         }
         host5: <default("WirelessHost")> like INetworkNode {
-            @display("p=100,95");
+            @display("p=100,90");
         }
         host6: <default("WirelessHost")> like INetworkNode {
-            @display("p=100.5,99.13397");
+            @display("p=110,110");
         }
        host7: <default("WirelessHost")> like INetworkNode {
-            @display("p=99.5,100.86605");
+            @display("p=110,90");
         }
         host8: <default("WirelessHost")> like INetworkNode {
-            @display("p=100.5,100.86605");
+            @display("p=90,110");
         }
         host9: <default("WirelessHost")> like INetworkNode {
-            @display("p=99.5,99.13397");
+            @display("p=90,90");
         }
         host10: <default("WirelessHost")> like INetworkNode {
-            @display("p=100.80,99.5529");
+            @display("p=90,97");
         }
 }

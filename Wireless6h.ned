@@ -20,7 +20,7 @@ import inet.visualizer.contract.IIntegratedVisualizer;
 network Wireless6h
 {
     parameters:
-        @display("bgb=650,500;bgg=100,1,grey95");
+        @display("bgb=709.632,430.41602;bgg=100,1,grey95");
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
 
         @figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
@@ -39,21 +39,21 @@ network Wireless6h
             @display("p=100,100");
         }
         host2: <default("WirelessHost")> like INetworkNode {
-            @display("p=105,100");
+            @display("p=110,100");
         }
         host3: <default("WirelessHost")> like INetworkNode {
-            @display("p=95,100");
+            @display("p=90,100");
         }
         host4: <default("WirelessHost")> like INetworkNode {
-            @display("p=100,105");
+            @display("p=100,110");
         }
         host5: <default("WirelessHost")> like INetworkNode {
-            @display("p=100,95");
+            @display("p=100,90");
         }
         host6: <default("WirelessHost")> like INetworkNode {
-            @display("p=100.5,99.13397");
+            @display("p=90,90");
         }
-       host7: <default("WirelessHost")> like INetworkNode {
-            @display("p=99.5,100.86605");
+        host7: <default("WirelessHost")> like INetworkNode {
+            @display("p=110,110");
         }
 }

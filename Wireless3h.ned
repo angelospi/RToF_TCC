@@ -39,12 +39,12 @@ network Wireless3h
             @display("p=100,100");
         }
         host2: <default("WirelessHost")> like INetworkNode {
-            @display("p=105,100");
+            @display("p=110,100");
         }
         host3: <default("WirelessHost")> like INetworkNode {
-            @display("p=95,100");
+            @display("p=90,100");
         }
         host4: <default("WirelessHost")> like INetworkNode {
-            @display("p=100,105");
+            @display("p=100,110");
         }
 }
