@@ -14,6 +14,8 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 
 #include <vector>
@@ -40,6 +42,8 @@
 #include "Backoff_m.h"
 #include <fstream>
 #include <string>
+#include <vector>
+#include <sstream>
 
 
 using namespace inet;
@@ -158,6 +162,7 @@ void RToFApp::sendPacket()
     emit(packetSentSignal, packet);
     socket.sendTo(packet, destAddr, destPort);
 
+
     numSent++;
 
 }
@@ -174,6 +179,49 @@ void RToFApp::handleMessageWhenUp(cMessage *msg)
 
 void RToFApp::finish()
 {
+    std::ifstream arq;
+    std::ofstream myfile;
+    double soma=0;
+    double cont=0;
+
+
+    arq.open("planilha_dados/"+std::string(arqName));
+    myfile.open ("planilha_dados/"+std::string(arqName),std::ios::app);
+
+    if(arq.is_open()){
+        std::string line;
+        std::vector<std::string> result;
+
+        while (std::getline(arq, line)) {
+            std::stringstream s_stream(line);
+
+            // Quebrando a linha em um vetor, utilizando a separacao por virgula
+            while(s_stream.good()) {
+                  std::string substr;
+                  getline(s_stream, substr, ',');
+                  result.push_back(substr);
+               }
+
+            // Try para pular valores q não sao numeros. Ex: espaco em branco e o cabecalho da planilha
+            try{
+                soma=soma+std::stod(result.at(4));
+                cont=cont+1;
+            }
+            catch(...){
+                result.clear();
+                cont=0;
+                soma=0;
+                continue;
+            }
+            result.clear();
+
+
+        }
+    }
+
+    myfile << "Média,,,,"<<soma/cont<<"\n";
+    myfile.close();
+    arq.close();
     ApplicationBase::finish();
 }
 
@@ -419,6 +467,7 @@ void RToFApp::processPacketIssuer(Packet *pk){
         xVector.clear();
         di.clear();
 
+
         numReceived=-1;
         sendPacket();
 
@@ -444,6 +493,7 @@ void RToFApp::insertToCsv(){
             myfile<<mL_x<<","<<mL_y<<",";
             myfile<<realPosition.x<<","<<realPosition.y<<",";
             myfile<<erro<<",";
+            myfile<<simTime()<<",";
 
             myfile<<"\n";
         }else{
@@ -454,13 +504,15 @@ void RToFApp::insertToCsv(){
             myfile << "Likelihood position Y (m),";
             myfile << "Real position X (m),";
             myfile << "Real position Y (m),";
-            myfile << "Erro";
+            myfile << "Erro,";
+            myfile << "Tempo de Simulacão,";
 
             myfile<<"\n";
 
             myfile<<mL_x<<","<<mL_y<<",";
             myfile<<realPosition.x<<","<<realPosition.y<<",";
             myfile<<erro<<",";
+            myfile<<simTime()<<",";
 
             myfile<<"\n";
         }
