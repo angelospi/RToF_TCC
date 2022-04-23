@@ -41,6 +41,7 @@ class INET_API RToFApp : public ApplicationBase, public UdpSocket::ICallback
     Coord realPosition;
     double mL_x, mL_y;
     int num_receptores;
+    int cont_csv;
 
     // parameters
     std::vector<L3Address> destAddresses;

@@ -72,6 +72,7 @@ void RToFApp::initialize(int stage)
         WATCH(numReceived);
         mL_x = 0;
         mL_y = 0;
+        cont_csv=0;
 
         overhead=0.001192000001;
         overhead_segundo_envio=0.001192000001+0.000228;
@@ -479,46 +480,50 @@ void RToFApp::processPacketIssuer(Packet *pk){
 
 
 void RToFApp::insertToCsv(){
-    if (!isReceiver){
-        std::ifstream arq;
-        std::ofstream myfile;
+    if(cont_csv==200){
+        if (!isReceiver){
+            std::ifstream arq;
+            std::ofstream myfile;
 
-        arq.open("planilha_dados/"+std::string(arqName));
+            arq.open("planilha_dados/"+std::string(arqName));
 
-        auto erro=calculationError();
+            auto erro=calculationError();
 
-        if(arq.is_open()){
-            myfile.open ("planilha_dados/"+std::string(arqName),std::ios::app);
+            if(arq.is_open()){
+                myfile.open ("planilha_dados/"+std::string(arqName),std::ios::app);
 
-            myfile<<mL_x<<","<<mL_y<<",";
-            myfile<<realPosition.x<<","<<realPosition.y<<",";
-            myfile<<erro<<",";
-            myfile<<simTime()<<",";
+                myfile<<mL_x<<","<<mL_y<<",";
+                myfile<<realPosition.x<<","<<realPosition.y<<",";
+                myfile<<erro<<",";
+                myfile<<simTime()<<",";
 
-            myfile<<"\n";
-        }else{
-            myfile.open("planilha_dados/"+std::string(arqName));
+                myfile<<"\n";
+            }else{
+                myfile.open("planilha_dados/"+std::string(arqName));
 
 
-            myfile << "Likelihood position X (m),";
-            myfile << "Likelihood position Y (m),";
-            myfile << "Real position X (m),";
-            myfile << "Real position Y (m),";
-            myfile << "Erro,";
-            myfile << "Tempo de Simulacão,";
+                myfile << "Likelihood position X (m),";
+                myfile << "Likelihood position Y (m),";
+                myfile << "Real position X (m),";
+                myfile << "Real position Y (m),";
+                myfile << "Erro,";
+                myfile << "Tempo de Simulacão,";
 
-            myfile<<"\n";
+                myfile<<"\n";
 
-            myfile<<mL_x<<","<<mL_y<<",";
-            myfile<<realPosition.x<<","<<realPosition.y<<",";
-            myfile<<erro<<",";
-            myfile<<simTime()<<",";
+                myfile<<mL_x<<","<<mL_y<<",";
+                myfile<<realPosition.x<<","<<realPosition.y<<",";
+                myfile<<erro<<",";
+                myfile<<simTime()<<",";
 
-            myfile<<"\n";
+                myfile<<"\n";
+            }
+            myfile.close();
+            arq.close();
         }
-        myfile.close();
-        arq.close();
+        cont_csv=0;
     }
+    cont_csv=cont_csv+1;
 }
 
 double RToFApp::calculationError(){
