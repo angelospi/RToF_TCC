@@ -158,7 +158,12 @@ void RToFApp::sendPacket()
     L3Address destAddr = chooseDestAddr();
 
     cModule *host = getContainingNode(this);
-    std::cout << "host: " << host << endl;
+    // std::cout << "host: " << host << endl;
+
+    IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
+    auto real_position = mobility->getCurrentPosition();
+    realPosition.x=real_position.x;
+    realPosition.y=real_position.y;
 
     emit(packetSentSignal, packet);
     socket.sendTo(packet, destAddr, destPort);
@@ -206,6 +211,10 @@ void RToFApp::finish()
             // Try para pular valores q não sao numeros. Ex: espaco em branco e o cabecalho da planilha
             try{
                 soma=soma+std::stod(result.at(4));
+
+                if (result.at(0) == "Média"){
+                        throw 3;
+                }
                 cont=cont+1;
             }
             catch(...){
@@ -327,7 +336,7 @@ void RToFApp::saveXPoints(const char *local){
     char x[9];
     char aux[] = ",";
     int j = 0;
-    std::cout << "----TESTE local: " << local << endl;
+    // std::cout << "----TESTE local: " << local << endl;
     for(i = 0;local[i+1] != aux[0];i++){
         x[i] = local[i+1];
     }
@@ -426,7 +435,7 @@ void RToFApp::processPacketIssuer(Packet *pk){
 
     if(need_calibration == 1){
         auto overhead = Calibration(broadcastTime, pk->getArrivalTime(), backoffTime->getBackoffTime() );//overhead from environment with two hosts is 0.001182000001
-        std::cout << "overhead: " << overhead << endl;
+        // std::cout << "overhead: " << overhead << endl;
     }
 
 
@@ -434,8 +443,9 @@ void RToFApp::processPacketIssuer(Packet *pk){
 
     //std::cout << "TESTE do CSMA: " << backoffTime->getBackoffTime() << " TESTE do cancel Time: " << backoffTime->getInitialBackoffTime() << endl;
 
-    //auto measuredWithNoise = pk->getArrivalTime() + host->intuniform(-2,2)*0.0000000125;
-    auto measuredWithNoise = pk->getArrivalTime();
+    cModule *host = getContainingNode(this);
+    auto measuredWithNoise = pk->getArrivalTime() + host->intuniform(-2,2)*0.0000000125;
+    //auto measuredWithNoise = pk->getArrivalTime();
 
     // std::cout << " measuredWithNoise"<<measuredWithNoise << endl;
 
@@ -453,11 +463,11 @@ void RToFApp::processPacketIssuer(Packet *pk){
         std::cout << "di: " << di[i] <<",   Time Flight: " << timeFlight[i] << endl;
     }
 
-    cModule *host = getContainingNode(this);
-    IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
-    auto real_position = mobility->getCurrentPosition();
-    realPosition.x=real_position.x;
-    realPosition.y=real_position.y;
+    // cModule *host = getContainingNode(this);
+    // IMobility *mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
+    // auto real_position = mobility->getCurrentPosition();
+    // realPosition.x=real_position.x;
+    // realPosition.y=real_position.y;
 
     //Verifica se recebeu as mensagens de todos os nós que deveria
     if(numReceived==(num_receptores-1)){
@@ -480,7 +490,7 @@ void RToFApp::processPacketIssuer(Packet *pk){
 
 
 void RToFApp::insertToCsv(){
-    if(cont_csv==200){
+    if(cont_csv==150){
         if (!isReceiver){
             std::ifstream arq;
             std::ofstream myfile;
